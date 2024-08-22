@@ -13,6 +13,9 @@ app.get('/', (req, res) => {
 
 app.post('/flames', (req, res) => {
     const { name1, name2 } = req.body;
+    if (!name1 || !name2) {
+        return res.status(400).send('Both names are required.');
+    }
     const result = calculateFlames(name1, name2);
     res.send(result);
 });
@@ -27,14 +30,29 @@ function calculateFlames(name1, name2) {
         { text: 'Siblings', emoji: '👫' }
     ];
 
-    let combined = name1.toLowerCase().replace(/ /g, '') + name2.toLowerCase().replace(/ /g, '');
-    let uniqueChars = Array.from(new Set(combined.split('')));
+    // Combine names and remove spaces
+    let combined = (name1 + name2).toLowerCase().replace(/ /g, '');
     
-    let totalLength = uniqueChars.reduce((total, char) => {
-        return total + (combined.split(char).length - 1) % flames.length;
-    }, 0);
+    // Count occurrences of each character
+    const charCount = {};
+    for (let char of combined) {
+        charCount[char] = (charCount[char] || 0) + 1;
+    }
+
+    // Calculate the number of unique characters
+    let total = 0;
+    for (let count of Object.values(charCount)) {
+        total += count;
+    }
     
-    const result = flames[totalLength % flames.length];
+    // Calculate the result index
+    let index = 0;
+    while (flames.length > 1) {
+        index = (index + total - 1) % flames.length;
+        flames.splice(index, 1);
+    }
+
+    const result = flames[0];
     return `The result is: <strong>${result.text}</strong> ${result.emoji}`;
 }
 
