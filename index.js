@@ -16,6 +16,15 @@ app.post('/flames', (req, res) => {
     if (!name1 || !name2) {
         return res.status(400).send('Both names are required.');
     }
+
+    // Check for specific names and respond accordingly
+    const lowerName1 = name1.toLowerCase();
+    const lowerName2 = name2.toLowerCase();
+    if (lowerName1 === 'naganjaneyulu' || lowerName2 === 'naganjaneyulu' ||
+        lowerName1 === 'sandhya' || lowerName2 === 'sandhya') {
+        return res.send('పో రా బేవకుఫ్ పోయి ఏమన పని వుంటే చూసుకో 🤨');
+    }
+
     const result = calculateFlames(name1, name2);
     res.send(result);
 });
